@@ -78,36 +78,36 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
         import { getDatabase, ref, set, remove, onValue } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js";
 
-        // ⚠️ IMPORTANTE: Reemplaza esta configuración con la tuya de Firebase
-        // Para obtenerla:
-        // 1. Ve a https://console.firebase.google.com/
-        // 2. Crea un proyecto (o usa uno existente)
-        // 3. Ve a Project Settings > General > Your apps
-        // 4. Crea una app web y copia la configuración
-        // 5. En Database, crea una Realtime Database (modo prueba está bien para empezar)
+        // Tu configuración de Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyAlW7S4tpn4YYkoov1Uq93KFmT8cY8Uzms",
-  authDomain: "app-reserva-de-portatiles.firebaseapp.com",
-  databaseURL: "https://app-reserva-de-portatiles-default-rtdb.europe-west1.firebasedatabase.app",
-  projectId: "app-reserva-de-portatiles",
-  storageBucket: "app-reserva-de-portatiles.firebasestorage.app",
-  messagingSenderId: "170712420790",
-  appId: "1:170712420790:web:e52d1831be2985c6af3117"
-};
+            authDomain: "app-reserva-de-portatiles.firebaseapp.com",
+            databaseURL: "https://app-reserva-de-portatiles-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "app-reserva-de-portatiles",
+            storageBucket: "app-reserva-de-portatiles.firebasestorage.app",
+            messagingSenderId: "170712420790",
+            appId: "1:170712420790:web:e52d1831be2985c6af3117"
+        };
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
+        // Inicializar Firebase
+        const app = initializeApp(firebaseConfig);
         const database = getDatabase(app);
 
         const periods = [
-            { id: 'p1', h: "09:00 - 10:00" }, { id: 'p2', h: "10:00 - 11:00" },
-            { id: 'p3', h: "11:00 - 12:00" }, { id: 'p4', h: "12:30 - 13:00" },
-            { id: 'p5', h: "13:00 - 13:30" }, { id: 'p6', h: "13:30 - 14:00" }
+            { id: 'p1', h: "09:00 - 10:00" }, 
+            { id: 'p2', h: "10:00 - 11:00" },
+            { id: 'p3', h: "11:00 - 12:00" }, 
+            { id: 'p4', h: "12:30 - 13:00" },
+            { id: 'p5', h: "13:00 - 13:30" }, 
+            { id: 'p6', h: "13:30 - 14:00" }
         ];
 
         let reserves = {};
         let selectedId = null;
         const today = new Date().toISOString().split('T')[0];
+
+        // Estado inicial
+        updateConnectionStatus('connecting', 'Conectando...');
 
         // Referencia a las reservas del día actual
         const reservasRef = ref(database, `reservas/${today}`);
@@ -236,9 +236,6 @@ const app = initializeApp(firebaseConfig);
             day: 'numeric', 
             month: 'long' 
         });
-
-        // Estado inicial
-        updateConnectionStatus('connecting', 'Conectando...');
     </script>
 </body>
 </html>
