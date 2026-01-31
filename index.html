@@ -86,16 +86,17 @@
         // 4. Crea una app web y copia la configuración
         // 5. En Database, crea una Realtime Database (modo prueba está bien para empezar)
         const firebaseConfig = {
-            apiKey: "AIzaSyBXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
-            authDomain: "tu-proyecto.firebaseapp.com",
-            databaseURL: "https://tu-proyecto-default-rtdb.europe-west1.firebasedatabase.app",
-            projectId: "tu-proyecto",
-            storageBucket: "tu-proyecto.appspot.com",
-            messagingSenderId: "123456789012",
-            appId: "1:123456789012:web:xxxxxxxxxxxx"
-        };
+            apiKey: "AIzaSyAlW7S4tpn4YYkoov1Uq93KFmT8cY8Uzms",
+  authDomain: "app-reserva-de-portatiles.firebaseapp.com",
+  databaseURL: "https://app-reserva-de-portatiles-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "app-reserva-de-portatiles",
+  storageBucket: "app-reserva-de-portatiles.firebasestorage.app",
+  messagingSenderId: "170712420790",
+  appId: "1:170712420790:web:e52d1831be2985c6af3117"
+};
 
-        const app = initializeApp(firebaseConfig);
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
         const database = getDatabase(app);
 
         const periods = [
