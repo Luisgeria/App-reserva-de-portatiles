@@ -20,7 +20,7 @@
 <body class="p-4 md:p-8">
 
     <div class="max-w-xl mx-auto">
-        <header class="text-center mb-10">
+        <header class="text-center mb-8">
             <h1 class="text-4xl font-black text-slate-900 tracking-tight mb-2">CEIP Puente de Simancas</h1>
             <div class="flex items-center justify-center gap-4">
                 <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center">
@@ -29,6 +29,34 @@
                 </span>
             </div>
         </header>
+
+        <!-- Instrucciones -->
+        <div class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-3xl p-6 shadow-sm border border-blue-100 mb-6">
+            <h2 class="text-sm font-black text-slate-800 mb-3 flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-600" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+                </svg>
+                Instrucciones de uso
+            </h2>
+            <ul class="space-y-2 text-xs text-slate-700">
+                <li class="flex items-start gap-2">
+                    <span class="text-blue-600 font-black mt-0.5">1.</span>
+                    <span>Haz clic en un tramo horario <strong>disponible</strong> para reservar los portátiles.</span>
+                </li>
+                <li class="flex items-start gap-2">
+                    <span class="text-blue-600 font-black mt-0.5">2.</span>
+                    <span>Completa tu nombre y curso en el formulario que aparece.</span>
+                </li>
+                <li class="flex items-start gap-2">
+                    <span class="text-blue-600 font-black mt-0.5">3.</span>
+                    <span>Solo tú podrás <strong>liberar</strong> tu reserva desde este dispositivo.</span>
+                </li>
+                <li class="flex items-start gap-2">
+                    <span class="text-red-600 font-black mt-0.5">⚠️</span>
+                    <span><strong>Importante:</strong> Si borras los datos del navegador o cambias de dispositivo, no podrás liberar tu reserva.</span>
+                </li>
+            </ul>
+        </div>
 
         <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-200 mb-8 flex items-center justify-between">
             <div>
@@ -46,8 +74,9 @@
             <div class="text-center py-10 text-slate-400 animate-pulse">Sincronizando horarios...</div>
         </div>
 
-        <div class="mt-8 text-center">
-            <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">App elaborada por @luisgeria Enero-2026</p>
+        <div class="mt-8 text-center space-y-2">
+            <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Base de Datos en Tiempo Real Activa</p>
+            <p class="text-[9px] text-slate-500 font-semibold">App elaborada por @luisgeria · Enero 2026</p>
         </div>
     </div>
 
