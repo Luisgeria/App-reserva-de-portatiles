@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reserva de Portátiles - CEIP Puente de Simancas</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap');
+        body { font-family: 'Outfit', sans-serif; background-color: #f1f5f9; }
+        .period-card { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); border-radius: 1.25rem; border: 2px solid #e2e8f0; }
+        .reserved { background-color: #fee2e2; border-color: #fca5a5; }
+        .available { background-color: #ffffff; cursor: pointer; }
+        .available:hover { border-color: #3b82f6; transform: translateY(-3px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
+        .modal { display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.7); align-items: center; justify-content: center; z-index: 50; backdrop-filter: blur(8px); }
+        .modal.active { display: flex; }
+        .status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 6px; transition: background-color 0.3s; }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <div class="max-w-xl mx-auto">
+        <header class="text-center mb-10">
+            <h1 class="text-4xl font-black text-slate-900 tracking-tight mb-2">CEIP Puente de Simancas</h1>
+            <div class="flex items-center justify-center gap-4">
+                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center">
+                    <span id="conn-dot" class="status-dot bg-slate-300"></span> 
+                    <span id="conn-text">Estableciendo conexión...</span>
+                </span>
+            </div>
+        </header>
+
+        <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-200 mb-8 flex items-center justify-between">
+            <div>
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Fecha de hoy</p>
+                <p id="date-display" class="text-lg font-bold text-blue-600 capitalize">...</p>
+            </div>
+            <button onclick="window.location.reload()" class="p-3 bg-slate-50 hover:bg-slate-100 rounded-2xl text-slate-600 transition-all active:scale-90">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+            </button>
+        </div>
+
+        <div id="periods-container" class="space-y-4">
+            <div class="text-center py-10 text-slate-400 animate-pulse">Sincronizando horarios...</div>
+        </div>
+
+        <div class="mt-8 text-center">
+            <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Base de Datos en Tiempo Real Activa</p>
+        </div>
+    </div>
+
+    <!-- Modal Reserva -->
+    <div id="reserve-modal" class="modal">
+        <div class="bg-white w-full max-w-sm m-4 p-8 rounded-[2.5rem] shadow-2xl" id="modal-content">
+            <h3 class="text-2xl font-black text-slate-900 mb-2">Nueva Reserva</h3>
+            <p id="modal-time-label" class="text-blue-600 font-bold mb-8 uppercase tracking-widest text-xs"></p>
+            
+            <form id="reserve-form" class="space-y-5">
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase mb-2 ml-1">Nombre Profesor/a</label>
+                    <input type="text" id="profesor-name" required placeholder="Nombre completo" class="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl p-4 outline-none focus:border-blue-500 transition-all">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase mb-2 ml-1">Curso / Grupo</label>
+                    <input type="text" id="curso-name" required placeholder="Ej. 6ºA" class="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl p-4 outline-none focus:border-blue-500 transition-all">
+                </div>
+                <div class="flex gap-3 pt-4">
+                    <button type="button" onclick="closeModal()" class="flex-1 py-4 font-bold text-slate-400 hover:text-slate-600">Cancelar</button>
+                    <button type="submit" id="submit-btn" class="flex-1 py-4 bg-blue-600 text-white font-bold rounded-2xl shadow-lg hover:bg-blue-700 active:scale-95 transition-all">Confirmar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
+        import { getFirestore, doc, setDoc, deleteDoc, onSnapshot, collection } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
+
+        // Configuración usando window.storage para sincronización entre dispositivos
+        let db, appId;
+        let reserves = {};
+        let selectedId = null;
+        const today = new Date().toISOString().split('T')[0];
+
+        const periods = [
+            { id: 'p1', h: "09:00 - 10:00" }, { id: 'p2', h: "10:00 - 11:00" },
+            { id: 'p3', h: "11:00 - 12:00" }, { id: 'p4', h: "12:30 - 13:00" },
+            { id: 'p5', h: "13:00 - 13:30" }, { id: 'p6', h: "13:30 - 14:00" }
+        ];
+
+        // Inicialización con Firebase Storage integrado
+        async function init() {
+            try {
+                // Intentar cargar configuración desde storage compartido
+                let config;
+                
+                if (window.storage) {
+                    try {
+                        const storedConfig = await window.storage.get('firebase_config', true);
+                        if (storedConfig && storedConfig.value) {
+                            config = JSON.parse(storedConfig.value);
+                        }
+                    } catch (e) {
+                        console.log("No hay configuración guardada, usando valores por defecto");
+                    }
+                }
+
+                // Si no hay configuración, usar una por defecto o solicitarla
+                if (!config) {
+                    // Aquí deberías poner tu configuración de Firebase
+                    config = {
+                        apiKey: "TU_API_KEY",
+                        authDomain: "TU_AUTH_DOMAIN",
+                        projectId: "TU_PROJECT_ID",
+                        storageBucket: "TU_STORAGE_BUCKET",
+                        messagingSenderId: "TU_MESSAGING_SENDER_ID",
+                        appId: "TU_APP_ID"
+                    };
+                    
+                    // Guardar en storage compartido para futuros usos
+                    if (window.storage) {
+                        try {
+                            await window.storage.set('firebase_config', JSON.stringify(config), true);
+                        } catch (e) {
+                            console.log("No se pudo guardar la configuración");
+                        }
+                    }
+                }
+
+                const app = initializeApp(config);
+                db = getFirestore(app);
+                appId = 'simancas-reservas';
+
+                updateConnectionStatus('connecting', 'Conectando...');
+                await startStorageSync();
+                
+            } catch (err) {
+                console.error("Error de inicialización:", err);
+                updateConnectionStatus('error', 'Error de conexión');
+            }
+        }
+
+        // Sistema de sincronización usando window.storage
+        async function startStorageSync() {
+            updateConnectionStatus('connected', 'Conectado');
+            
+            // Cargar datos iniciales
+            await loadReservations();
+            
+            // Sincronizar cada 3 segundos
+            setInterval(async () => {
+                await loadReservations();
+            }, 3000);
+
+            render();
+        }
+
+        async function loadReservations() {
+            if (!window.storage) {
+                console.error("Storage no disponible");
+                return;
+            }
+
+            try {
+                const keys = await window.storage.list('reserva:', true);
+                if (!keys || !keys.keys) {
+                    reserves = {};
+                    render();
+                    return;
+                }
+
+                const newReserves = {};
+                
+                for (const key of keys.keys) {
+                    try {
+                        const data = await window.storage.get(key, true);
+                        if (data && data.value) {
+                            const reservation = JSON.parse(data.value);
+                            if (reservation.date === today) {
+                                newReserves[reservation.slotId] = reservation;
+                            }
+                        }
+                    } catch (e) {
+                        console.error("Error leyendo reserva:", e);
+                    }
+                }
+
+                reserves = newReserves;
+                render();
+                
+            } catch (err) {
+                console.error("Error cargando reservas:", err);
+            }
+        }
+
+        function updateConnectionStatus(status, text) {
+            const dot = document.getElementById('conn-dot');
+            const textEl = document.getElementById('conn-text');
+            
+            if (status === 'connected') {
+                dot.className = 'status-dot bg-green-500';
+            } else if (status === 'connecting') {
+                dot.className = 'status-dot bg-yellow-500';
+            } else {
+                dot.className = 'status-dot bg-red-500';
+            }
+            
+            textEl.innerText = text;
+        }
+
+        function render() {
+            const container = document.getElementById('periods-container');
+            if (!container) return;
+            container.innerHTML = '';
+
+            periods.forEach(p => {
+                const data = reserves[p.id];
+                const card = document.createElement('div');
+                card.className = `period-card p-6 flex items-center justify-between ${data ? 'reserved' : 'available'}`;
+                
+                card.innerHTML = `
+                    <div class="flex flex-col">
+                        <span class="text-[10px] font-bold uppercase tracking-widest ${data ? 'text-red-500' : 'text-slate-400'}">Tramo horario</span>
+                        <span class="text-xl font-black text-slate-800">${p.h}</span>
+                    </div>
+                    ${data ? `
+                        <div class="text-right">
+                            <p class="font-black text-slate-900 text-lg leading-tight">${data.profe}</p>
+                            <p class="text-slate-500 text-xs font-bold">${data.curso}</p>
+                            <button onclick="window.liberar('${p.id}')" class="mt-3 text-[10px] bg-red-100 text-red-600 px-3 py-1.5 rounded-xl font-black hover:bg-red-200 transition-all uppercase tracking-tighter">Liberar</button>
+                        </div>
+                    ` : `
+                        <div class="bg-blue-50 text-blue-600 px-4 py-2 rounded-2xl font-black text-[10px] uppercase tracking-widest border border-blue-100">Disponible</div>
+                    `}
+                `;
+
+                if (!data) card.onclick = () => openModal(p.id, p.h);
+                container.appendChild(card);
+            });
+        }
+
+        window.openModal = (id, label) => {
+            selectedId = id;
+            document.getElementById('modal-time-label').innerText = label;
+            document.getElementById('reserve-modal').classList.add('active');
+        };
+
+        window.closeModal = () => {
+            document.getElementById('reserve-modal').classList.remove('active');
+            document.getElementById('reserve-form').reset();
+            const btn = document.getElementById('submit-btn');
+            btn.innerText = "Confirmar";
+            btn.disabled = false;
+        };
+
+        window.liberar = async (slotId) => {
+            if (!window.storage) return;
+            
+            if (confirm('¿Quieres liberar este horario?')) {
+                try {
+                    const key = `reserva:${today}_${slotId}`;
+                    await window.storage.delete(key, true);
+                    await loadReservations();
+                } catch (e) { 
+                    console.error("Error liberando:", e);
+                    alert("Error al liberar el horario. Intenta de nuevo.");
+                }
+            }
+        };
+
+        document.getElementById('reserve-form').onsubmit = async (e) => {
+            e.preventDefault();
+            if (!window.storage) {
+                alert("Sistema de almacenamiento no disponible");
+                return;
+            }
+
+            const btn = document.getElementById('submit-btn');
+            btn.innerText = "Guardando...";
+            btn.disabled = true;
+
+            const key = `reserva:${today}_${selectedId}`;
+
+            try {
+                const reserva = {
+                    slotId: selectedId,
+                    date: today,
+                    profe: document.getElementById('profesor-name').value,
+                    curso: document.getElementById('curso-name').value,
+                    timestamp: Date.now()
+                };
+
+                await window.storage.set(key, JSON.stringify(reserva), true);
+                await loadReservations();
+                closeModal();
+            } catch (err) {
+                console.error("Error al guardar:", err);
+                alert("Error al guardar la reserva. Intenta de nuevo.");
+                btn.innerText = "Reintentar";
+                btn.disabled = false;
+            }
+        };
+
+        // Establecer fecha
+        document.getElementById('date-display').innerText = new Date().toLocaleDateString('es-ES', { 
+            weekday: 'long', 
+            day: 'numeric', 
+            month: 'long' 
+        });
+
+        // Iniciar aplicación
+        init();
+    </script>
+</body>
+</html>
