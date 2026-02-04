@@ -82,14 +82,48 @@
             transition: background-color 0.3s; 
         }
         
-        /* Tabla responsive */
+        /* Tabla responsive con scroll visible */
+        .schedule-table { 
+            display: block; 
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        /* Barra de scroll visible y estilizada */
+        .schedule-table::-webkit-scrollbar {
+            height: 12px;
+        }
+        
+        .schedule-table::-webkit-scrollbar-track {
+            background: #dcfce7;
+            border-radius: 10px;
+            margin: 10px;
+        }
+        
+        .schedule-table::-webkit-scrollbar-thumb {
+            background: #16a34a;
+            border-radius: 10px;
+            border: 2px solid #dcfce7;
+        }
+        
+        .schedule-table::-webkit-scrollbar-thumb:hover {
+            background: #15803d;
+        }
+        
+        /* Para Firefox */
+        .schedule-table {
+            scrollbar-width: thin;
+            scrollbar-color: #16a34a #dcfce7;
+        }
+        
         @media (max-width: 768px) {
-            .schedule-table { 
-                display: block; 
-                overflow-x: auto; 
-            }
             .period-cell {
                 min-height: 100px;
+            }
+            
+            /* Asegurar ancho mínimo de tabla en móvil */
+            #schedule-table {
+                min-width: 700px;
             }
         }
     </style>
