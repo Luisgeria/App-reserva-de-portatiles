@@ -30,11 +30,18 @@
             min-height: 100vh;
         }
         
-        .period-card { 
+        .day-header { 
+            position: sticky; 
+            top: 0; 
+            z-index: 10; 
+            background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+        }
+        
+        .period-cell { 
             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); 
-            border-radius: 1.5rem; 
+            border-radius: 1rem; 
             border: 3px solid #bbf7d0;
-            min-height: 100px;
+            min-height: 95px;
         }
         
         .reserved { 
@@ -49,15 +56,15 @@
         
         .available:hover, .available:active { 
             border-color: #16a34a; 
-            transform: translateY(-3px); 
-            box-shadow: 0 12px 20px -5px rgba(22, 163, 74, 0.3); 
+            transform: translateY(-2px); 
+            box-shadow: 0 6px 12px -2px rgba(22, 163, 74, 0.25); 
         }
         
         .modal { 
             display: none; 
             position: fixed; 
             inset: 0; 
-            background: rgba(15, 23, 42, 0.7); 
+            background: rgba(21, 128, 61, 0.3); 
             align-items: center; 
             justify-content: center; 
             z-index: 50; 
@@ -75,69 +82,25 @@
             transition: background-color 0.3s; 
         }
         
-        /* Banner de instalación PWA */
-        #install-banner { 
-            position: fixed; 
-            bottom: 20px; 
-            left: 50%; 
-            transform: translateX(-50%); 
-            z-index: 100;
-            display: none;
-            animation: slideUp 0.3s ease-out;
-        }
-        
-        #install-banner.show { display: block; }
-        
-        @keyframes slideUp {
-            from { transform: translateX(-50%) translateY(100px); opacity: 0; }
-            to { transform: translateX(-50%) translateY(0); opacity: 1; }
-        }
-        
-        /* Tamaños aumentados para móvil */
+        /* Tabla responsive */
         @media (max-width: 768px) {
-            .period-card {
-                min-height: 110px;
-                padding: 1.5rem !important;
+            .schedule-table { 
+                display: block; 
+                overflow-x: auto; 
             }
-            
-            .text-mobile-xl {
-                font-size: 1.375rem;
-            }
-            
-            .text-mobile-lg {
-                font-size: 1.125rem;
-            }
-            
-            .text-mobile-base {
-                font-size: 1rem;
-            }
-            
-            .text-mobile-sm {
-                font-size: 0.9375rem;
+            .period-cell {
+                min-height: 100px;
             }
         }
     </style>
 </head>
-<body class="p-5 md:p-8">
+<body class="p-5 md:p-6">
 
-    <!-- Banner de instalación PWA -->
-    <div id="install-banner" class="bg-green-600 text-white px-6 py-4 rounded-2xl shadow-2xl max-w-sm mx-4">
-        <div class="flex items-center gap-4">
-            <div class="flex-1">
-                <p class="font-bold text-sm">📱 Instalar App</p>
-                <p class="text-xs opacity-90">Accede más rápido desde tu pantalla de inicio</p>
-            </div>
-            <button id="install-button" class="bg-white text-green-600 px-4 py-2 rounded-xl font-bold text-sm hover:bg-green-50 transition-all active:scale-95">
-                Instalar
-            </button>
-            <button id="close-banner" class="text-white opacity-70 hover:opacity-100 text-xl leading-none">✕</button>
-        </div>
-    </div>
-
-    <div class="max-w-2xl mx-auto">
-        <header class="text-center mb-8">
-            <h1 class="text-4xl md:text-5xl font-black text-green-800 tracking-tight mb-3">CEIP Puente de Simancas</h1>
-            <div class="flex items-center justify-center gap-4">
+    <div class="max-w-7xl mx-auto">
+        <header class="text-center mb-6">
+            <h1 class="text-3xl md:text-4xl font-black text-green-800 tracking-tight mb-2">💻 Portátiles</h1>
+            <p class="text-base md:text-lg text-green-700 font-semibold">CEIP Puente de Simancas</p>
+            <div class="flex items-center justify-center gap-4 mt-3">
                 <span class="text-xs md:text-sm font-bold text-green-600 uppercase tracking-widest flex items-center">
                     <span id="conn-dot" class="status-dot bg-slate-300"></span> 
                     <span id="conn-text">Estableciendo conexión...</span>
@@ -145,51 +108,70 @@
             </div>
         </header>
 
-        <!-- Instrucciones con tonos verdes -->
-        <div class="bg-gradient-to-br from-green-50 to-emerald-50 rounded-3xl p-6 md:p-7 shadow-md border-2 border-green-200 mb-7">
-            <h2 class="text-lg md:text-xl font-black text-green-900 mb-5 flex items-center gap-3">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-green-600" viewBox="0 0 20 20" fill="currentColor">
+        <!-- Instrucciones -->
+        <div class="bg-gradient-to-br from-green-50 to-emerald-50 rounded-3xl p-6 md:p-7 shadow-md border-2 border-green-200 mb-6">
+            <h2 class="text-lg md:text-xl font-black text-green-900 mb-4 flex items-center gap-3">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-600" viewBox="0 0 20 20" fill="currentColor">
                     <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
                 </svg>
-                Instrucciones de uso
+                Instrucciones
             </h2>
-            <ul class="space-y-4 text-mobile-sm md:text-base text-slate-700 leading-relaxed">
-                <li class="flex items-start gap-3">
-                    <span class="text-green-600 font-black text-xl mt-0.5">1.</span>
-                    <span>Haz clic en un tramo horario <strong>disponible</strong> para reservar los portátiles.</span>
+            <ul class="space-y-3 text-sm md:text-base text-slate-700 leading-relaxed">
+                <li class="flex items-start gap-2">
+                    <span class="text-green-600 font-black text-lg">•</span>
+                    <span>Haz clic en un horario <strong>disponible</strong> para reservar los portátiles.</span>
                 </li>
-                <li class="flex items-start gap-3">
-                    <span class="text-green-600 font-black text-xl mt-0.5">2.</span>
-                    <span>Completa tu nombre y curso en el formulario que aparece.</span>
-                </li>
-                <li class="flex items-start gap-3">
-                    <span class="text-green-600 font-black text-xl mt-0.5">3.</span>
-                    <span>Solo tú podrás <strong>liberar</strong> tu reserva desde este dispositivo.</span>
-                </li>
-                <li class="flex items-start gap-3">
-                    <span class="text-red-600 font-black text-xl mt-0.5">⚠️</span>
-                    <span><strong>Importante:</strong> Si borras los datos del navegador o cambias de dispositivo, no podrás liberar tu reserva.</span>
+                <li class="flex items-start gap-2">
+                    <span class="text-green-600 font-black text-lg">•</span>
+                    <span>Solo puedes <strong>liberar</strong> tus propias reservas desde este dispositivo.</span>
                 </li>
             </ul>
         </div>
 
-        <div class="bg-white rounded-3xl p-6 shadow-md border-2 border-green-200 mb-8 flex items-center justify-between">
-            <div>
-                <p class="text-xs md:text-sm font-bold text-green-600 uppercase tracking-widest mb-1">Fecha de hoy</p>
-                <p id="date-display" class="text-mobile-lg md:text-xl font-bold text-green-700 capitalize">...</p>
+        <!-- Navegación semanal -->
+        <div class="bg-white rounded-3xl p-5 shadow-md border-2 border-green-200 mb-6">
+            <div class="flex items-center justify-between gap-4">
+                <button id="prev-week" class="p-3 bg-green-50 hover:bg-green-100 rounded-2xl transition-all active:scale-95">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-700" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
+                    </svg>
+                </button>
+                <div class="text-center flex-1">
+                    <p class="text-xs md:text-sm font-bold text-green-600 uppercase tracking-widest mb-1">Semana actual</p>
+                    <p id="week-range" class="text-base md:text-lg font-black text-green-700">...</p>
+                </div>
+                <button id="next-week" class="p-3 bg-green-50 hover:bg-green-100 rounded-2xl transition-all active:scale-95">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-700" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                    </svg>
+                </button>
             </div>
-            <button onclick="window.location.reload()" class="p-3 bg-green-50 hover:bg-green-100 rounded-2xl text-green-700 transition-all active:scale-90">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                </svg>
-            </button>
         </div>
 
-        <div id="periods-container" class="space-y-5">
-            <div class="text-center py-12 text-green-500 animate-pulse text-lg font-semibold">Sincronizando horarios...</div>
+        <!-- Tabla de horarios -->
+        <div class="bg-white rounded-3xl shadow-lg border-2 border-green-200 overflow-hidden schedule-table">
+            <table class="w-full" id="schedule-table">
+                <thead>
+                    <tr class="day-header text-white">
+                        <th class="p-4 text-left text-xs md:text-sm font-bold uppercase tracking-wider">Horario</th>
+                        <th class="p-4 text-center text-xs md:text-sm font-bold uppercase tracking-wider">Lun</th>
+                        <th class="p-4 text-center text-xs md:text-sm font-bold uppercase tracking-wider">Mar</th>
+                        <th class="p-4 text-center text-xs md:text-sm font-bold uppercase tracking-wider">Mié</th>
+                        <th class="p-4 text-center text-xs md:text-sm font-bold uppercase tracking-wider">Jue</th>
+                        <th class="p-4 text-center text-xs md:text-sm font-bold uppercase tracking-wider">Vie</th>
+                    </tr>
+                </thead>
+                <tbody id="schedule-body">
+                    <tr>
+                        <td colspan="6" class="p-10 text-center text-green-500 animate-pulse text-base font-semibold">
+                            Cargando horarios...
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
 
-        <div class="mt-10 text-center space-y-2">
+        <div class="mt-8 text-center space-y-2">
             <p class="text-xs text-green-600 font-bold uppercase tracking-widest">Base de Datos en Tiempo Real Activa</p>
             <p class="text-xs text-green-700 font-semibold">App elaborada por @luisgeria · Enero 2026</p>
         </div>
@@ -197,9 +179,9 @@
 
     <!-- Modal Reserva -->
     <div id="reserve-modal" class="modal">
-        <div class="bg-white w-full max-w-md m-5 p-8 rounded-[2.5rem] shadow-2xl" id="modal-content">
+        <div class="bg-white w-full max-w-md m-5 p-8 rounded-[2.5rem] shadow-2xl">
             <h3 class="text-2xl md:text-3xl font-black text-green-900 mb-2">Nueva Reserva</h3>
-            <p id="modal-time-label" class="text-green-600 font-bold mb-8 uppercase tracking-widest text-sm"></p>
+            <p id="modal-time-label" class="text-green-600 font-bold mb-7 text-sm md:text-base"></p>
             
             <form id="reserve-form" class="space-y-6">
                 <div>
@@ -214,7 +196,7 @@
                 </div>
                 <div class="flex gap-4 pt-4">
                     <button type="button" onclick="closeModal()" 
-                        class="flex-1 py-4 font-bold text-base text-slate-500 hover:text-slate-700 transition-colors">Cancelar</button>
+                        class="flex-1 py-4 text-base font-bold text-slate-500 hover:text-slate-700 transition-colors">Cancelar</button>
                     <button type="submit" id="submit-btn" 
                         class="flex-1 py-4 text-base bg-green-600 text-white font-bold rounded-2xl shadow-lg hover:bg-green-700 active:scale-95 transition-all">Confirmar</button>
                 </div>
@@ -222,41 +204,11 @@
         </div>
     </div>
 
-    <!-- PWA Install Logic - SIN Service Worker -->
-    <script>
-        // Detectar si la app puede instalarse
-        let deferredPrompt;
-        
-        window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault();
-            deferredPrompt = e;
-            
-            // Mostrar banner solo en móvil
-            if (window.innerWidth <= 768) {
-                document.getElementById('install-banner').classList.add('show');
-            }
-        });
-
-        document.getElementById('install-button').addEventListener('click', async () => {
-            if (deferredPrompt) {
-                deferredPrompt.prompt();
-                const { outcome } = await deferredPrompt.userChoice;
-                deferredPrompt = null;
-                document.getElementById('install-banner').classList.remove('show');
-            }
-        });
-
-        document.getElementById('close-banner').addEventListener('click', () => {
-            document.getElementById('install-banner').classList.remove('show');
-        });
-    </script>
-
-    <!-- Firebase Setup -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
         import { getDatabase, ref, set, remove, onValue } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js";
 
-        // Tu configuración de Firebase
+        // Configuración de Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyAlW7S4tpn4YYkoov1Uq93KFmT8cY8Uzms",
             authDomain: "app-reserva-de-portatiles.firebaseapp.com",
@@ -267,7 +219,6 @@
             appId: "1:170712420790:web:e52d1831be2985c6af3117"
         };
 
-        // Inicializar Firebase
         const app = initializeApp(firebaseConfig);
         const database = getDatabase(app);
 
@@ -280,12 +231,12 @@
             { id: 'p6', h: "13:30 - 14:00" }
         ];
 
+        const dayNames = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'];
         let reserves = {};
-        let selectedId = null;
+        let selectedSlot = null;
         let userId = null;
-        const today = new Date().toISOString().split('T')[0];
+        let currentWeekStart = null;
 
-        // Generar o recuperar ID único de usuario
         function getUserId() {
             let id = localStorage.getItem('userId');
             if (!id) {
@@ -295,28 +246,191 @@
             return id;
         }
 
-        userId = getUserId();
-        updateConnectionStatus('connecting', 'Conectando...');
+        function getMonday(d) {
+            d = new Date(d);
+            const day = d.getDay();
+            const diff = d.getDate() - day + (day === 0 ? -6 : 1);
+            return new Date(d.setDate(diff));
+        }
 
-        const reservasRef = ref(database, `reservas/${today}`);
+        function formatDate(date) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
 
-        onValue(reservasRef, (snapshot) => {
+        function formatDisplayDate(date) {
+            return date.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' });
+        }
+
+        function updateWeekDisplay() {
+            const endDate = new Date(currentWeekStart);
+            endDate.setDate(endDate.getDate() + 4);
+            document.getElementById('week-range').innerText = 
+                `${formatDisplayDate(currentWeekStart)} - ${formatDisplayDate(endDate)}`;
+        }
+
+        function initWeek() {
+            currentWeekStart = getMonday(new Date());
+            updateWeekDisplay();
+            loadWeekData();
+        }
+
+        function loadWeekData() {
             reserves = {};
-            const data = snapshot.val();
-            
-            if (data) {
-                Object.keys(data).forEach(key => {
-                    reserves[data[key].slotId] = data[key];
+            updateConnectionStatus('connecting', 'Conectando...');
+
+            const promises = [];
+
+            for (let i = 0; i < 5; i++) {
+                const date = new Date(currentWeekStart);
+                date.setDate(date.getDate() + i);
+                const dateStr = formatDate(date);
+
+                const promise = new Promise((resolve) => {
+                    const dayRef = ref(database, `reservas/${dateStr}`);
+                    onValue(dayRef, (snapshot) => {
+                        const data = snapshot.val();
+                        if (data) {
+                            Object.keys(data).forEach(key => {
+                                const slotKey = `${dateStr}_${data[key].slotId}`;
+                                reserves[slotKey] = data[key];
+                            });
+                        }
+                        resolve();
+                    });
                 });
+                
+                promises.push(promise);
             }
+
+            Promise.all(promises).then(() => {
+                updateConnectionStatus('connected', 'Conectado');
+                render();
+            });
+        }
+
+        function render() {
+            const tbody = document.getElementById('schedule-body');
+            tbody.innerHTML = '';
+
+            periods.forEach(period => {
+                const row = document.createElement('tr');
+                row.className = 'border-b border-slate-100';
+                
+                const timeCell = document.createElement('td');
+                timeCell.className = 'p-3 md:p-4 font-bold text-slate-700 text-sm md:text-base';
+                timeCell.innerText = period.h;
+                row.appendChild(timeCell);
+
+                for (let i = 0; i < 5; i++) {
+                    const date = new Date(currentWeekStart);
+                    date.setDate(date.getDate() + i);
+                    const dateStr = formatDate(date);
+                    const slotKey = `${dateStr}_${period.id}`;
+                    const data = reserves[slotKey];
+
+                    const cell = document.createElement('td');
+                    cell.className = 'p-2 md:p-3';
+
+                    const div = document.createElement('div');
+                    div.className = `period-cell p-3 md:p-4 flex flex-col items-center justify-center ${data ? 'reserved' : 'available'}`;
+
+                    const canLiberate = data && data.userId === userId;
+
+                    if (data) {
+                        div.innerHTML = `
+                            <p class="font-bold text-slate-900 text-xs md:text-sm text-center leading-tight mb-1">${data.profe}</p>
+                            <p class="text-slate-500 text-[10px] md:text-xs font-semibold">${data.curso}</p>
+                            ${canLiberate ? `
+                                <button onclick="window.liberar('${dateStr}', '${period.id}')" class="mt-2 text-[10px] md:text-xs bg-red-100 text-red-600 px-2 md:px-3 py-1 md:py-1.5 rounded-lg font-black hover:bg-red-200 active:bg-red-300 transition-all uppercase">Liberar</button>
+                            ` : ''}
+                        `;
+                    } else {
+                        div.innerHTML = '<span class="text-green-600 text-xs md:text-sm font-bold">Disponible</span>';
+                        div.onclick = () => openModal(dateStr, period.id, period.h, dayNames[i]);
+                    }
+
+                    cell.appendChild(div);
+                    row.appendChild(cell);
+                }
+
+                tbody.appendChild(row);
+            });
+        }
+
+        window.openModal = (date, slotId, time, day) => {
+            selectedSlot = { date, slotId };
+            document.getElementById('modal-time-label').innerText = `${day} - ${time}`;
+            document.getElementById('reserve-modal').classList.add('active');
+        };
+
+        window.closeModal = () => {
+            document.getElementById('reserve-modal').classList.remove('active');
+            document.getElementById('reserve-form').reset();
+            document.getElementById('submit-btn').innerText = "Confirmar";
+            document.getElementById('submit-btn').disabled = false;
+        };
+
+        window.liberar = async (date, slotId) => {
+            const slotKey = `${date}_${slotId}`;
+            const reserva = reserves[slotKey];
             
-            updateConnectionStatus('connected', 'Conectado');
-            render();
-        }, (error) => {
-            console.error("Error de conexión:", error);
-            updateConnectionStatus('error', 'Error de conexión');
-            render();
-        });
+            if (!reserva || reserva.userId !== userId) {
+                alert('Solo quien reservó puede liberar este horario.');
+                return;
+            }
+
+            if (confirm('¿Quieres liberar este horario?')) {
+                try {
+                    const slotRef = ref(database, `reservas/${date}/${slotId}`);
+                    await remove(slotRef);
+                } catch (e) { 
+                    console.error("Error liberando:", e);
+                    alert("Error al liberar el horario.");
+                }
+            }
+        };
+
+        document.getElementById('reserve-form').onsubmit = async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('submit-btn');
+            btn.innerText = "Guardando...";
+            btn.disabled = true;
+
+            try {
+                const reserva = {
+                    slotId: selectedSlot.slotId,
+                    date: selectedSlot.date,
+                    profe: document.getElementById('profesor-name').value,
+                    curso: document.getElementById('curso-name').value,
+                    timestamp: Date.now(),
+                    userId: userId
+                };
+
+                const slotRef = ref(database, `reservas/${selectedSlot.date}/${selectedSlot.slotId}`);
+                await set(slotRef, reserva);
+                closeModal();
+            } catch (err) {
+                console.error("Error al guardar:", err);
+                alert("Error al guardar la reserva.");
+                btn.innerText = "Reintentar";
+                btn.disabled = false;
+            }
+        };
+
+        document.getElementById('prev-week').onclick = () => {
+            currentWeekStart.setDate(currentWeekStart.getDate() - 7);
+            updateWeekDisplay();
+            loadWeekData();
+        };
+
+        document.getElementById('next-week').onclick = () => {
+            currentWeekStart.setDate(currentWeekStart.getDate() + 7);
+            updateWeekDisplay();
+            loadWeekData();
+        };
 
         function updateConnectionStatus(status, text) {
             const dot = document.getElementById('conn-dot');
@@ -333,108 +447,9 @@
             textEl.innerText = text;
         }
 
-        function render() {
-            const container = document.getElementById('periods-container');
-            if (!container) return;
-            container.innerHTML = '';
-
-            periods.forEach(p => {
-                const data = reserves[p.id];
-                const card = document.createElement('div');
-                card.className = `period-card p-6 flex items-center justify-between ${data ? 'reserved' : 'available'}`;
-                
-                const canLiberate = data && data.userId === userId;
-                
-                card.innerHTML = `
-                    <div class="flex flex-col">
-                        <span class="text-xs md:text-sm font-bold uppercase tracking-widest ${data ? 'text-red-500' : 'text-green-600'} mb-1">Tramo horario</span>
-                        <span class="text-mobile-xl md:text-2xl font-black text-slate-800">${p.h}</span>
-                    </div>
-                    ${data ? `
-                        <div class="text-right">
-                            <p class="font-black text-slate-900 text-mobile-lg md:text-xl leading-tight mb-1">${data.profe}</p>
-                            <p class="text-slate-500 text-sm md:text-base font-bold mb-2">${data.curso}</p>
-                            ${canLiberate ? `
-                                <button onclick="window.liberar('${p.id}')" class="mt-2 text-xs md:text-sm bg-red-100 text-red-600 px-4 py-2 rounded-xl font-black hover:bg-red-200 active:bg-red-300 transition-all uppercase tracking-tight">Liberar</button>
-                            ` : `
-                                <div class="mt-2 text-xs md:text-sm text-slate-400 px-4 py-2 rounded-xl font-black uppercase tracking-tight">Reservado</div>
-                            `}
-                        </div>
-                    ` : `
-                        <div class="bg-green-100 text-green-700 px-5 py-3 rounded-2xl font-black text-xs md:text-sm uppercase tracking-widest border-2 border-green-200">Disponible</div>
-                    `}
-                `;
-
-                if (!data) card.onclick = () => openModal(p.id, p.h);
-                container.appendChild(card);
-            });
-        }
-
-        window.openModal = (id, label) => {
-            selectedId = id;
-            document.getElementById('modal-time-label').innerText = label;
-            document.getElementById('reserve-modal').classList.add('active');
-        };
-
-        window.closeModal = () => {
-            document.getElementById('reserve-modal').classList.remove('active');
-            document.getElementById('reserve-form').reset();
-            const btn = document.getElementById('submit-btn');
-            btn.innerText = "Confirmar";
-            btn.disabled = false;
-        };
-
-        window.liberar = async (slotId) => {
-            const reserva = reserves[slotId];
-            if (!reserva || reserva.userId !== userId) {
-                alert('Solo quien reservó puede liberar este horario.');
-                return;
-            }
-
-            if (confirm('¿Quieres liberar este horario?')) {
-                try {
-                    const slotRef = ref(database, `reservas/${today}/${slotId}`);
-                    await remove(slotRef);
-                } catch (e) { 
-                    console.error("Error liberando:", e);
-                    alert("Error al liberar el horario. Intenta de nuevo.");
-                }
-            }
-        };
-
-        document.getElementById('reserve-form').onsubmit = async (e) => {
-            e.preventDefault();
-
-            const btn = document.getElementById('submit-btn');
-            btn.innerText = "Guardando...";
-            btn.disabled = true;
-
-            try {
-                const reserva = {
-                    slotId: selectedId,
-                    date: today,
-                    profe: document.getElementById('profesor-name').value,
-                    curso: document.getElementById('curso-name').value,
-                    timestamp: Date.now(),
-                    userId: userId
-                };
-
-                const slotRef = ref(database, `reservas/${today}/${selectedId}`);
-                await set(slotRef, reserva);
-                closeModal();
-            } catch (err) {
-                console.error("Error al guardar:", err);
-                alert("Error al guardar la reserva. Verifica tu conexión.");
-                btn.innerText = "Reintentar";
-                btn.disabled = false;
-            }
-        };
-
-        document.getElementById('date-display').innerText = new Date().toLocaleDateString('es-ES', { 
-            weekday: 'long', 
-            day: 'numeric', 
-            month: 'long' 
-        });
+        userId = getUserId();
+        updateConnectionStatus('connecting', 'Conectando...');
+        initWeek();
     </script>
 </body>
 </html>
